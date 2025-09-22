@@ -115,15 +115,17 @@ export default function Profile() {
           // 2. Upload file directly to GCS
           const ac = new AbortController();
           const t = setTimeout(() => ac.abort(), 15000);
-          const uploadResponse = await fetch(uploadData.uploadUrl, {
-            method: 'PUT',
-            body: pendingProfilePicture.file,
-            headers: {
-              'Content-Type': pendingProfilePicture.type,
-            },
-            signal: ac.signal,
-          });
-          clearTimeout(t);
+          let uploadResponse: Response;
+          try {
+            uploadResponse = await fetch(uploadData.uploadUrl, {
+              method: 'PUT',
+              body: pendingProfilePicture.file,
+              headers: { 'Content-Type': pendingProfilePicture.type },
+              signal: ac.signal,
+            });
+          } finally {
+            clearTimeout(t);
+          }
 
           if (!uploadResponse.ok) {
             throw new Error('Failed to upload file to storage');
@@ -270,7 +272,11 @@ export default function Profile() {
             </Button>
             <Button
               onClick={form.handleSubmit(handleSave)}
-              disabled={updateProfileMutation.isPending || getUploadUrlMutation.isPending}
+              disabled={
+                form.formState.isSubmitting ||
+                updateProfileMutation.isPending ||
+                getUploadUrlMutation.isPending
+              }
               className="flex items-center space-x-2"
             >
               <Save className="h-4 w-4" />
@@ -289,7 +295,7 @@ export default function Profile() {
                 <AvatarSelector
                   currentAvatar={
                     pendingProfilePicture 
-                      ? profilePicturePreviewUrl!
+                      ? (profilePicturePreviewUrl ?? undefined)
                       : pendingDicebearAvatar 
                         ? pendingDicebearAvatar
                         : (profile?.profile as any)?.profilePicture
@@ -336,7 +342,7 @@ export default function Profile() {
           </CardHeader>
           <CardContent>
             <Form {...form}>
-              <form className="space-y-6">
+              <form className="space-y-6" onSubmit={form.handleSubmit(handleSave)}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <FormField
                     control={form.control}
@@ -423,6 +429,9 @@ export default function Profile() {
                     </FormItem>
                   )}
                 />
+                
+                {/* Hidden submit to allow Enter key to submit from inputs */}
+                <button type="submit" className="hidden" aria-hidden />
               </form>
             </Form>
           </CardContent>

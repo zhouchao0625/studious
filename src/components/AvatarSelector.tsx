@@ -100,18 +100,21 @@ export function AvatarSelector({
   };
 
   const handleCustomUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
+    const input = event.currentTarget;
+    const file = input.files?.[0];
     if (!file) return;
 
     // Validate file type
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
     if (!allowedTypes.includes(file.type)) {
       toast.error("Please upload a valid image (JPEG, PNG, GIF, or WebP)");
+      input.value = "";
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
       toast.error("Profile picture must be less than 5MB");
+      input.value = "";
       return;
     }
 
@@ -136,6 +139,7 @@ export function AvatarSelector({
       setIsOpen(false);
     } catch (error) {
       console.error("Failed to upload image:", error);
+      toast.error("Failed to process the image. Please try again.");
     } finally {
       setIsProcessing(false);
     }
@@ -328,15 +332,17 @@ export function AvatarSelector({
                       onClick={() => {
                         setPreviewImage(null);
                         setSelectedFile(null);
+                        if (fileInputRef.current) fileInputRef.current.value = "";
                       }}
                       className="flex items-center space-x-2"
                     >
                       <X className="h-4 w-4" />
                       <span>Choose Different</span>
                     </Button>
-                    <Button 
+                    <Button
                       onClick={handleConfirmUpload}
                       disabled={isProcessing}
+                      aria-busy={isProcessing}
                       className="flex items-center space-x-2"
                     >
                       {isProcessing ? (
