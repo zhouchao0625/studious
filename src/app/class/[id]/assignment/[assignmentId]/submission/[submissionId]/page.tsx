@@ -43,6 +43,7 @@ import {
 } from "lucide-react";
 import { RootState } from "@/store/store";
 import { useSelector } from "react-redux";
+import { baseFileHandler } from "@/lib/fileHandler";
 
 type Submission = RouterOutputs['assignment']['getSubmissionById'];
 type Assignment = RouterOutputs['assignment']['get'];
@@ -344,15 +345,8 @@ export default function SubmissionDetailPage() {
 
   // File handlers for submission files
   const fileHandlers: FileHandlers = {
+    ...baseFileHandler,
     onFolderClick: () => {}, // Not used in assignment context
-    onDownload: async (item: FileItem) => {
-      console.log("Download file:", item);
-      // TODO: Implement download for submission files
-    },
-    onShare: async (item: FileItem) => {
-      console.log("Share file:", item);
-      // TODO: Implement share for submission files
-    },
     onRename: async () => {
       // Not allowed in submission view
     },

@@ -44,6 +44,7 @@ import {
   Presentation,
   File
 } from "lucide-react";
+import { baseFileHandler } from "@/lib/fileHandler";
 
 type Assignment = RouterOutputs['assignment']['get'];
 type AssignmentUpdateInput = RouterInputs['assignment']['update'];
@@ -338,19 +339,7 @@ export default function AssignmentEditPage() {
 
   // File handlers for attachments
   const fileHandlers: FileHandlers = {
-    onFolderClick: () => {}, // Not used in assignment context
-    onDownload: async (item: FileItem) => {
-      console.log("Download file:", item);
-      // TODO: Implement download for attachments
-    },
-    onShare: async (item: FileItem) => {
-      console.log("Share file:", item);
-      // TODO: Implement share for attachments
-    },
-    onRename: async (item: FileItem, newName: string) => {
-      console.log("Rename file:", item, newName);
-      // TODO: Implement rename for attachments
-    },
+    ...baseFileHandler,
     onDelete: async (item: FileItem) => {
       removeAttachment(item.id);
     },

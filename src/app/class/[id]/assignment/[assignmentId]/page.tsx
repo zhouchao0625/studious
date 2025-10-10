@@ -47,6 +47,7 @@ import type {
 } from "@/lib/types/assignment";
 import {  parseMarkScheme,
   parseGradingBoundary} from "@/lib/types/assignment";
+import { baseFileHandler } from "@/lib/fileHandler";
 
 type Assignment = RouterOutputs['assignment']['get'];
 type Submissions = RouterOutputs['assignment']['getSubmissions'];
@@ -246,15 +247,8 @@ export default function AssignmentDetailPage() {
 
   // File handlers for attachments (read-only in assignment view)
   const fileHandlers: FileHandlers = {
+    ...baseFileHandler,
     onFolderClick: () => {}, // Not used in assignment context
-    onDownload: async (item: FileItem) => {
-      console.log("Download file:", item);
-      // TODO: Implement download for attachments
-    },
-    onShare: async (item: FileItem) => {
-      console.log("Share file:", item);
-      // TODO: Implement share for attachments  
-    },
     onRename: async () => {
       // Not allowed in assignment view
     },
