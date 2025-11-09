@@ -50,10 +50,10 @@ function DropZone({
 }) {
   const [{ isOver, draggedItem, canDrop }, drop] = useDrop({
     accept: ["assignment", "folder"],
-    canDrop: (item: { id: string; type?: string, index?: number }) => {
-      // Allow drop if it's a teacher and not dropping on the same position
+    canDrop: () => {
+      // Allow drop if it's a teacher
       // Works for both assignments and sections (folders)
-      return isTeacher && item.index !== index;
+      return isTeacher;
     },
     drop: (item: { id: string; type?: string, index?: number }, monitor: DropTargetMonitor) => {
       if (monitor.didDrop()) return;
@@ -81,7 +81,7 @@ function DropZone({
   // Works for both assignments and sections (folders)
   const isDragging = !!draggedItem;
   const isDraggingSection = draggedItem?.type === "folder";
-  const shouldShow = isDragging && canDrop && draggedItem && draggedItem.index !== index;
+  const shouldShow = isDragging && canDrop;
   const isActive = isOver && shouldShow;
 
   if (!shouldShow) {
@@ -340,9 +340,10 @@ export default function Assignments() {
     );
     if (currentIndex === -1 || currentIndex === targetIndex) return;
 
-    // Find the target item (can be either assignment or section)
-    const targetItem = topLevelItems[targetIndex];
-    if (!targetItem) return;
+    // Check if inserting at end before accessing targetItem
+    const insertingAtEnd = targetIndex >= topLevelItems.length;
+    const targetItem = insertingAtEnd ? null : topLevelItems[targetIndex];
+    if (!insertingAtEnd && !targetItem) return;
 
     // Determine position and targetId based on drop position
     let position: 'start' | 'end' | 'before' | 'after';
@@ -350,7 +351,7 @@ export default function Assignments() {
 
     if (targetIndex === 0) {
       position = 'start';
-    } else if (targetIndex >= topLevelItems.length - 1) {
+    } else if (insertingAtEnd) {
       position = 'end';
     } else if (currentIndex < targetIndex) {
       // Moving down: place after the item before target
@@ -359,14 +360,16 @@ export default function Assignments() {
       targetId = beforeTarget.data.id;
     } else {
       // Moving up: place before the target item
+      // targetItem is guaranteed to exist here since we checked !insertingAtEnd && !targetItem above
       position = 'before';
-      targetId = targetItem.data.id;
+      targetId = targetItem!.data.id;
     }
 
     const original = [...topLevelItems];
     const next = [...topLevelItems];
     const [moved] = next.splice(currentIndex, 1);
-    next.splice(targetIndex, 0, moved);
+    // Use safe insertion index for end-of-list drops
+    next.splice(Math.min(targetIndex, next.length), 0, moved);
     setTopLevelItems(next);
 
     try {
