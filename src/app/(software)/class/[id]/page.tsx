@@ -20,6 +20,8 @@ import {
   Paperclip,
   X,
   Loader2,
+  MoreVertical,
+  Clock,
 } from "lucide-react";
 import { trpc, type RouterOutputs } from "@/lib/trpc";
 import { toast } from "sonner";
@@ -28,6 +30,7 @@ import { RootState } from "@/store/store";
 import { useTranslations } from "next-intl";
 import { fixUploadUrl } from "@/lib/directUpload";
 import { AnnouncementCard } from "@/components/announcements/AnnouncementCard";
+import { format } from "date-fns";
 
 type Class = RouterOutputs['class']['get']['class'];
 type Announcement = RouterOutputs['class']['get']['class']['announcements'][number];
@@ -459,7 +462,7 @@ function AssignmentItem({ assignment }: { assignment: Assignment }) {
             <p className="font-medium text-sm">{t('newAssignment')}</p>
             <p className="text-xs text-muted-foreground flex items-center">
               <Clock className="h-3 w-3 mr-1" />
-              {format(new Date(assignment.createdAt), 'MMM d, yyyy \'at\' h:mm a')}
+              {format(new Date(assignment.modifiedAt || assignment.createdAt), 'MMM d, yyyy \'at\' h:mm a')}
             </p>
           </div>
         </div>

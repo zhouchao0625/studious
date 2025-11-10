@@ -312,7 +312,7 @@ export const AnnouncementCard = memo(function AnnouncementCard({ announcement, c
   });
 
   // Check if user can edit/delete
-  const canEdit = announcement.teacherId === currentUserId || isTeacher;
+  const canEdit = announcement.teacher.id === currentUserId || isTeacher;
   const canDelete = canEdit;
 
   // Delete mutation
@@ -549,9 +549,9 @@ export const AnnouncementCard = memo(function AnnouncementCard({ announcement, c
 
   // Memoize expensive computations
   const isModified = useMemo(() => 
-    announcement.updatedAt && 
-    new Date(announcement.updatedAt).getTime() !== new Date(announcement.createdAt).getTime(),
-    [announcement.updatedAt, announcement.createdAt]
+    announcement.modifiedAt && 
+    new Date(announcement.modifiedAt).getTime() !== new Date(announcement.createdAt).getTime(),
+    [announcement.modifiedAt, announcement.createdAt]
   );
   
   // Try multiple possible attachment property names - memoized
