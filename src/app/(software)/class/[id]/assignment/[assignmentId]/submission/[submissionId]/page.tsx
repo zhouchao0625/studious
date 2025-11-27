@@ -171,10 +171,14 @@ export default function SubmissionDetailPage() {
   });
 
   // Update submission as teacher mutation
+  const utils = trpc.useUtils();
   const updateSubmissionMutation = trpc.assignment.updateSubmissionAsTeacher.useMutation({
     onSuccess: () => {
-        toast.success("Grade saved");
-      refetchSubmission();
+      toast.success("Grade saved");
+      // Invalidate submissions list cache to update grades display
+      utils.assignment.getSubmissions.invalidate({ assignmentId: assignmentId as string });
+      // Navigate back to assignment detail page
+      router.push(`/class/${classId}/assignment/${assignmentId}`);
     },
     onError: (error) => {
       toast.error(error.message || "There was a problem saving the grade. Please try again.");
