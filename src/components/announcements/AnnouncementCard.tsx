@@ -378,8 +378,8 @@ export const AnnouncementCard = memo(function AnnouncementCard({ announcement, c
   });
 
   const handleDelete = useCallback(() => {
-    deleteMutation.mutate({ id: announcement.id });
-  }, [deleteMutation, announcement.id]);
+    deleteMutation.mutate({ id: announcement.id, classId: classId });
+  }, [deleteMutation, announcement.id, classId]);
 
   const handleSaveAnnouncement = useCallback(() => {
     if (!editAnnouncementText.trim()) {
